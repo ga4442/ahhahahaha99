@@ -573,54 +573,70 @@ async function processWatermark() {
 
     const pages = pdfDoc2.getPages();
 
-    // Helvetica 내장 폰트 (설치 불필요, 영문/숫자/특수문자 지원)
-    const font = await pdfDoc2.embedFont(StandardFonts.Helvetica);
+    // 첫 페이지 크기 기준으로 워터마크 PNG 1장 생성 (모든 페이지 공용)
+    // 300dpi급 고해상도로 그려서 인쇄 화질 확보
+    const scale = 3; // 3배 = 약 216dpi (A4 기준)
+    const refPage = pages[0];
+    const refW = Math.round(refPage.getSize().width * scale);
+    const refH = Math.round(refPage.getSize().height * scale);
 
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = refW;
+    offCanvas.height = refH;
+    const ctx = offCanvas.getContext('2d');
+
+    // 투명 배경에 타일 워터마크
+    ctx.clearRect(0, 0, refW, refH);
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = 'rgba(25, 25, 90, 1)';
+    const scaledFont = Math.round(fontSize * scale);
+    ctx.font = `500 ${scaledFont}px "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`;
+    ctx.textBaseline = 'middle';
+
+    const textWidth = ctx.measureText(wmText).width;
+    const stepX = textWidth + spacing * scale;
+    const stepY = spacing * scale * 0.65;
     const angleRad = angleDeg * Math.PI / 180;
-    const cosA = Math.cos(angleRad);
-    const sinA = Math.sin(angleRad);
 
-    // 워터마크 텍스트 폭 계산 (Helvetica 기준)
-    const textWidth = font.widthOfTextAtSize(wmText, fontSize);
-    const stepX = textWidth + spacing;
-    const stepY = spacing * 0.65;
+    const diag = Math.sqrt(refW * refW + refH * refH);
+    const cols = Math.ceil(diag / stepX) + 3;
+    const rows = Math.ceil(diag / stepY) + 3;
+
+    ctx.save();
+    ctx.translate(refW / 2, refH / 2);
+    ctx.rotate(angleRad);
+    for (let r = -rows; r <= rows; r++) {
+      for (let c = -cols; c <= cols; c++) {
+        const x = c * stepX + (r % 2) * (stepX / 2);
+        const y = r * stepY;
+        ctx.fillText(wmText, x - textWidth / 2, y);
+      }
+    }
+    ctx.restore();
+
+    setProgress(40);
+    await new Promise(r => setTimeout(r, 30));
+
+    // canvas → PNG bytes
+    const pngDataUrl = offCanvas.toDataURL('image/png');
+    const b64 = pngDataUrl.split(',')[1];
+    const binStr = atob(b64);
+    const pngBytes = new Uint8Array(binStr.length);
+    for (let i = 0; i < binStr.length; i++) pngBytes[i] = binStr.charCodeAt(i);
+
+    setProgress(50);
+    await new Promise(r => setTimeout(r, 30));
+
+    const wmImage = await pdfDoc2.embedPng(pngBytes);
 
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i];
       const { width, height } = page.getSize();
-      const cx = width / 2;
-      const cy = height / 2;
+      // 워터마크 이미지를 페이지 전체에 투명하게 덮음
+      page.drawImage(wmImage, { x: 0, y: 0, width, height, opacity: 1 });
 
-      const diag = Math.sqrt(width * width + height * height);
-      const cols = Math.ceil(diag / stepX) + 3;
-      const rows = Math.ceil(diag / stepY) + 3;
-
-      for (let r = -rows; r <= rows; r++) {
-        for (let c = -cols; c <= cols; c++) {
-          const localX = c * stepX + (r % 2) * (stepX / 2);
-          const localY = r * stepY;
-          const rotX = localX * cosA - localY * sinA;
-          const rotY = localX * sinA + localY * cosA;
-          const finalX = cx + rotX - textWidth / 2;
-          const finalY = cy + rotY - fontSize / 3;
-
-          if (finalX < -300 || finalX > width + 300) continue;
-          if (finalY < -300 || finalY > height + 300) continue;
-
-          page.drawText(wmText, {
-            x: finalX,
-            y: finalY,
-            size: fontSize,
-            font,
-            color: rgb(0.1, 0.1, 0.35),
-            opacity,
-            rotate: degrees(angleDeg),
-          });
-        }
-      }
-
-      setProgress(25 + Math.round((i + 1) / pages.length * 60));
-      await new Promise(r => setTimeout(r, 0)); // 페이지마다 UI 업데이트
+      setProgress(50 + Math.round((i + 1) / pages.length * 38));
+      await new Promise(r => setTimeout(r, 0));
     }
 
     setProgress(88);
