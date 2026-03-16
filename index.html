@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="description" content="">
-<title>참약사</title>
+<title>비밀입니다</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,15 +96,15 @@ body { font-family: 'IBM Plex Sans KR', sans-serif; background: #f4f6f9; min-hei
           <input type="text" id="iName" placeholder="예: 어쩌고약국" oninput="updateSwatch()">
         </div>
         <div class="field">
-          <label>추가 정보 (선택)</label>
-          <input type="text" id="iExtra" placeholder="예: 000약사님" oninput="updateSwatch()">
+          <label>약사명 (선택입력) ㅣ [참고] 워터마크에 생성일은 자동으로 입력됩니다. </label>
+          <input type="text" id="iExtra" placeholder="예: 김00약사님" oninput="updateSwatch()">
         </div>
         <div class="divider"></div>
         <div class="field">
           <label>글자 크기</label>
           <div class="sr">
-            <input type="range" id="iSize" min="35" max="80" value="35" step="1" oninput="updateSwatch(); document.getElementById('vSize').textContent=this.value+'pt'">
-            <span class="sv" id="vSize">35pt</span>
+            <input type="range" id="iSize" min="35" max="80" value="40" step="1" oninput="updateSwatch(); document.getElementById('vSize').textContent=this.value+'pt'">
+            <span class="sv" id="vSize">40pt</span>
           </div>
         </div>
         <div class="field">
@@ -142,7 +142,7 @@ body { font-family: 'IBM Plex Sans KR', sans-serif; background: #f4f6f9; min-hei
           <span id="fPages" style="color:#9ca3af;font-weight:400;"></span>
           <button class="rm" id="rmBtn">×</button>
         </div>
-        <button class="btn-main" id="processBtn" disabled>워터마크 삽입 후 다운로드</button>
+        <button class="btn-main" id="processBtn" disabled>워터마크 삽입 클릭</button>
       </div>
     </div>
   </div>
