@@ -3,288 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 검색엔진 인덱싱 완전 차단 -->
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache">
-<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="bingbot" content="noindex, nofollow">
-<meta name="referrer" content="no-referrer">
-<!-- OG/SNS 미리보기 차단 -->
-<meta property="og:title" content="">
-<meta property="og:description" content="">
-<meta property="og:image" content="">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
 <meta name="description" content="">
 <title>참약사</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'IBM Plex Sans KR', sans-serif; background: #f4f6f9; min-height: 100vh; color: #1a1a2e; }
 
-body {
-  font-family: 'IBM Plex Sans KR', -apple-system, sans-serif;
-  background: #f4f6f9;
-  min-height: 100vh;
-  color: #1a1a2e;
-}
+.app-bar { background: #1A5FBE; padding: 0 2rem; height: 56px; display: flex; align-items: center; gap: 12px; }
+.app-bar .logo { width: 28px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: white; }
+.app-bar h1 { font-size: 15px; font-weight: 500; color: white; }
+.app-bar .badge { margin-left: auto; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
 
-.app-bar {
-  background: #1A5FBE;
-  padding: 0 2rem;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.app-bar .logo {
-  width: 28px; height: 28px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 600; color: white;
-}
-.app-bar h1 { font-size: 15px; font-weight: 500; color: white; letter-spacing: 0.02em; }
-.app-bar .badge {
-  margin-left: auto;
-  background: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.9);
-  font-size: 11px; padding: 3px 10px; border-radius: 20px;
-}
+.main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start; }
 
-.main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.panel {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e8ef;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-.panel-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid #f0f2f7;
-  display: flex; align-items: center; gap: 8px;
-}
-.panel-header .icon {
-  width: 22px; height: 22px;
-  border-radius: 6px; background: #EEF4FF;
-  display: flex; align-items: center; justify-content: center;
-}
-.panel-header h2 { font-size: 13px; font-weight: 600; color: #1a1a2e; letter-spacing: 0.02em; }
+.panel { background: white; border-radius: 12px; border: 1px solid #e5e8ef; overflow: hidden; margin-bottom: 1rem; }
+.panel-header { padding: 13px 18px; border-bottom: 1px solid #f0f2f7; display: flex; align-items: center; gap: 8px; }
+.panel-header h2 { font-size: 13px; font-weight: 600; }
 .panel-body { padding: 18px; }
 
 .field { margin-bottom: 14px; }
-.field label {
-  display: block; font-size: 11px; font-weight: 600;
-  color: #6b7280; letter-spacing: 0.06em;
-  text-transform: uppercase; margin-bottom: 6px;
-}
-.field input {
-  width: 100%; padding: 9px 12px; font-size: 13px;
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  border: 1px solid #e5e8ef; border-radius: 8px;
-  background: #fafbfc; color: #1a1a2e; outline: none;
-  transition: border-color 0.15s, background 0.15s;
-}
+.field label { display: block; font-size: 11px; font-weight: 600; color: #6b7280; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+.field input { width: 100%; padding: 9px 12px; font-size: 13px; font-family: 'IBM Plex Sans KR', sans-serif; border: 1px solid #e5e8ef; border-radius: 8px; background: #fafbfc; color: #1a1a2e; outline: none; }
 .field input:focus { border-color: #1A5FBE; background: white; }
-.field input::placeholder { color: #b0b8c9; }
+.field input::placeholder { color: #c0c8d8; }
 
 .slider-row { display: flex; align-items: center; gap: 10px; }
-.slider-row input[type=range] {
-  flex: 1; padding: 0; height: 4px;
-  -webkit-appearance: none; background: #e5e8ef; border-radius: 4px; border: none;
-}
-.slider-row input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 16px; height: 16px;
-  background: #1A5FBE; border-radius: 50%; cursor: pointer;
-}
+.slider-row input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; background: #e5e8ef; border-radius: 4px; border: none; padding: 0; }
+.slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #1A5FBE; border-radius: 50%; cursor: pointer; }
 .slider-val { min-width: 36px; text-align: right; font-size: 12px; font-weight: 600; color: #1A5FBE; }
-
-.upload-zone {
-  border: 2px dashed #d1d8e8; border-radius: 10px;
-  padding: 2rem 1rem; text-align: center; cursor: pointer;
-  transition: all 0.15s; background: #fafbfc; margin-bottom: 14px;
-}
-.upload-zone:hover, .upload-zone.drag { border-color: #1A5FBE; background: #EEF4FF; }
-.upload-zone .upload-icon {
-  width: 40px; height: 40px; margin: 0 auto 10px;
-  background: #EEF4FF; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-}
-.upload-zone p.main-text { font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 4px; }
-.upload-zone p.sub-text { font-size: 11px; color: #9ca3af; }
-
-.file-info {
-  display: none;
-  background: #f0f7ff; border: 1px solid #bdd7ff; border-radius: 8px;
-  padding: 10px 14px; font-size: 12px; color: #1A5FBE; font-weight: 500;
-  margin-bottom: 14px; align-items: center; gap: 8px;
-}
-.file-info.show { display: flex; }
-.remove-btn {
-  margin-left: auto; background: none; border: none;
-  cursor: pointer; color: #9ca3af; font-size: 18px; line-height: 1; padding: 0;
-}
-
-.btn-process {
-  width: 100%; padding: 13px; background: #1A5FBE; color: white;
-  border: none; border-radius: 9px; font-size: 14px; font-weight: 600;
-  font-family: 'IBM Plex Sans KR', sans-serif; cursor: pointer;
-  transition: background 0.15s, opacity 0.15s; letter-spacing: 0.02em;
-}
-.btn-process:hover:not(:disabled) { background: #1550A0; }
-.btn-process:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* 알림 박스 */
-.notice {
-  background: #fff8e6; border: 1px solid #ffd666;
-  border-radius: 8px; padding: 10px 14px;
-  font-size: 12px; color: #7a5900; line-height: 1.6;
-  margin-bottom: 14px; display: none;
-}
-.notice.show { display: block; }
-.notice strong { color: #5a4000; }
-
-/* 상태 태그 */
-.tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.tag {
-  font-size: 11px; padding: 3px 10px; border-radius: 20px;
-  font-weight: 600; letter-spacing: 0.03em;
-}
-.tag.green { background: #e6f7ee; color: #1a7a45; }
-.tag.blue { background: #EEF4FF; color: #1A5FBE; }
-.tag.gray { background: #f0f2f7; color: #6b7280; }
 
 .divider { height: 1px; background: #f0f2f7; margin: 14px 0; }
 
-/* 미리보기 */
-.preview-panel {
-  background: white; border-radius: 12px; border: 1px solid #e5e8ef;
-  overflow: hidden; position: sticky; top: 2rem;
-}
-.preview-toolbar {
-  padding: 10px 16px; border-bottom: 1px solid #f0f2f7;
-  display: flex; align-items: center; gap: 10px; background: #fafbfc;
-}
-.preview-toolbar span { font-size: 12px; color: #6b7280; font-weight: 500; }
+.wm-swatch { height: 56px; background: #1A5FBE; border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
 
+.upload-zone { border: 2px dashed #d1d8e8; border-radius: 10px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.15s; background: #fafbfc; margin-bottom: 14px; }
+.upload-zone:hover, .upload-zone.drag { border-color: #1A5FBE; background: #EEF4FF; }
+.upload-zone p.mt { font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 3px; }
+.upload-zone p.st { font-size: 11px; color: #9ca3af; }
+
+.file-info { display: none; background: #f0f7ff; border: 1px solid #bdd7ff; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #1A5FBE; font-weight: 500; margin-bottom: 14px; align-items: center; gap: 8px; }
+.file-info.show { display: flex; }
+.rm-btn { margin-left: auto; background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; line-height: 1; padding: 0; }
+
+.btn-process { width: 100%; padding: 13px; background: #1A5FBE; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; font-family: 'IBM Plex Sans KR', sans-serif; cursor: pointer; transition: background 0.15s; }
+.btn-process:hover:not(:disabled) { background: #1550A0; }
+.btn-process:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.preview-panel { background: white; border-radius: 12px; border: 1px solid #e5e8ef; overflow: hidden; position: sticky; top: 2rem; }
+.preview-toolbar { padding: 10px 16px; border-bottom: 1px solid #f0f2f7; display: flex; align-items: center; gap: 10px; background: #fafbfc; }
+.preview-toolbar span { font-size: 12px; color: #6b7280; font-weight: 500; }
 .page-nav { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-.page-nav button {
-  width: 26px; height: 26px; border: 1px solid #e5e8ef; border-radius: 6px;
-  background: white; cursor: pointer; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
-  color: #374151; transition: all 0.12s;
-}
+.page-nav button { width: 26px; height: 26px; border: 1px solid #e5e8ef; border-radius: 6px; background: white; cursor: pointer; font-size: 14px; color: #374151; display: flex; align-items: center; justify-content: center; }
 .page-nav button:hover:not(:disabled) { border-color: #1A5FBE; color: #1A5FBE; }
 .page-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
 .page-info { font-size: 12px; color: #6b7280; min-width: 60px; text-align: center; }
 
-.canvas-wrap {
-  padding: 16px; background: #e8ecf3;
-  min-height: 360px; display: flex; align-items: center; justify-content: center;
-}
+.canvas-wrap { padding: 16px; background: #e8ecf3; min-height: 340px; display: flex; align-items: center; justify-content: center; }
 #previewCanvas { max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-radius: 2px; display: block; }
-
-.empty-preview { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #9ca3af; }
-.empty-preview .ep-icon {
-  width: 48px; height: 48px; background: #f0f2f7;
-  border-radius: 12px; display: flex; align-items: center; justify-content: center;
-}
-.empty-preview p { font-size: 13px; text-align: center; line-height: 1.6; }
+.empty-state { text-align: center; color: #9ca3af; font-size: 13px; line-height: 1.8; }
 
 .progress-bar { display: none; height: 3px; background: #e5e8ef; }
 .progress-bar.show { display: block; }
-.progress-fill { height: 100%; background: #1A5FBE; width: 0%; transition: width 0.25s; }
+.progress-fill { height: 100%; background: #1A5FBE; transition: width 0.2s; }
 
-.download-bar {
-  display: none; padding: 14px 16px; border-top: 1px solid #f0f2f7;
-  background: #fafbfc; gap: 10px; align-items: center;
-}
+.status-msg { padding: 8px 16px; font-size: 12px; color: #6b7280; background: #fafbfc; border-top: 1px solid #f0f2f7; display: none; }
+.status-msg.show { display: block; }
+
+.download-bar { display: none; padding: 14px 16px; border-top: 1px solid #f0f2f7; background: #fafbfc; align-items: center; gap: 10px; }
 .download-bar.show { display: flex; }
 .download-info { font-size: 12px; color: #6b7280; }
-.btn-download {
-  padding: 10px 20px; background: #1A5FBE; color: white; border: none;
-  border-radius: 8px; font-size: 13px; font-weight: 600;
-  font-family: 'IBM Plex Sans KR', sans-serif; cursor: pointer;
-  transition: background 0.15s; margin-left: auto;
-}
-.btn-download:hover { background: #1550A0; }
-
-.wm-swatch {
-  height: 56px; background: #1A5FBE; border-radius: 8px;
-  overflow: hidden; position: relative; margin-bottom: 14px;
-}
+.btn-dl { padding: 10px 20px; background: #1A5FBE; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: 'IBM Plex Sans KR', sans-serif; cursor: pointer; margin-left: auto; }
+.btn-dl:hover { background: #1550A0; }
 </style>
 </head>
 <body>
 
 <div class="app-bar">
   <div class="logo">참</div>
-  <h1>참약사 인쇄용 워터마크 삽입기</h1>
-  <span class="badge">대외비 · CONFIDENTIAL</span>
+  <h1>참약사 인쇄용 워터마크</h1>
+  <span class="badge">CONFIDENTIAL · 대외비</span>
 </div>
 
 <div class="main">
   <div>
-    <!-- 워터마크 설정 -->
     <div class="panel">
-      <div class="panel-header">
-        <div class="icon">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <rect x="1" y="1" width="10" height="10" rx="2" stroke="#1A5FBE" stroke-width="1.5"/>
-            <line x1="3" y1="4.5" x2="9" y2="4.5" stroke="#1A5FBE" stroke-width="1.2"/>
-            <line x1="3" y1="7" x2="7" y2="7" stroke="#1A5FBE" stroke-width="1.2"/>
-          </svg>
-        </div>
-        <h2>워터마크 설정</h2>
-      </div>
+      <div class="panel-header"><h2>워터마크 설정</h2></div>
       <div class="panel-body">
         <div class="field">
           <label>약국명</label>
-          <input type="text" id="pharmacyName" placeholder="예: 플레이스약국" oninput="updateSwatch()">
+          <input type="text" id="pharmacyName" placeholder="예: 어쩌고약국" oninput="updateSwatch()">
         </div>
         <div class="field">
           <label>추가 정보 (선택)</label>
           <input type="text" id="extraText" placeholder="예: 원장님 전달용" oninput="updateSwatch()">
         </div>
-
         <div class="divider"></div>
-
         <div class="field">
           <label>글자 크기</label>
           <div class="slider-row">
-            <input type="range" id="wmSize" min="6" max="22" value="11" step="1"
-              oninput="updateSwatch(); document.getElementById('wmSizeVal').textContent=this.value+'pt'">
+            <input type="range" id="wmSize" min="6" max="22" value="11" step="1" oninput="updateSwatch(); document.getElementById('wmSizeVal').textContent=this.value+'pt'">
             <span class="slider-val" id="wmSizeVal">11pt</span>
           </div>
         </div>
         <div class="field">
           <label>투명도</label>
           <div class="slider-row">
-            <input type="range" id="wmOpacity" min="3" max="30" value="10" step="1"
-              oninput="updateSwatch(); document.getElementById('wmOpacityVal').textContent=this.value+'%'">
+            <input type="range" id="wmOpacity" min="3" max="30" value="10" step="1" oninput="updateSwatch(); document.getElementById('wmOpacityVal').textContent=this.value+'%'">
             <span class="slider-val" id="wmOpacityVal">10%</span>
           </div>
         </div>
         <div class="field">
           <label>간격</label>
           <div class="slider-row">
-            <input type="range" id="wmSpacing" min="40" max="200" value="100" step="5"
-              oninput="updateSwatch(); document.getElementById('wmSpacingVal').textContent=this.value+'pt'">
-            <span class="slider-val" id="wmSpacingVal">100pt</span>
+            <input type="range" id="wmSpacing" min="30" max="180" value="90" step="5" oninput="updateSwatch(); document.getElementById('wmSpacingVal').textContent=this.value">
+            <span class="slider-val" id="wmSpacingVal">90</span>
           </div>
         </div>
-
         <div class="divider"></div>
-
         <div class="field">
           <label>미리보기</label>
           <div class="wm-swatch" id="wmSwatch"></div>
@@ -292,91 +132,42 @@ body {
       </div>
     </div>
 
-    <!-- PDF 업로드 -->
     <div class="panel">
-      <div class="panel-header">
-        <div class="icon">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 10h8M6 2v6M3.5 5.5L6 8l2.5-2.5" stroke="#1A5FBE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <h2>PDF 파일</h2>
-      </div>
+      <div class="panel-header"><h2>PDF 파일</h2></div>
       <div class="panel-body">
-
-        <div class="tag-row">
-          <span class="tag green">✓ 벡터 텍스트 — 화질 손실 없음</span>
-          <span class="tag blue">✓ 검색 불가 처리</span>
-          <span class="tag gray">브라우저 내 처리</span>
-        </div>
-
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('pdfInput').click()">
-          <div class="upload-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 3v10M6 7l4-4 4 4" stroke="#1A5FBE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M3 17h14" stroke="#1A5FBE" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <p class="main-text">PDF 파일을 올려주세요</p>
-          <p class="sub-text">클릭하거나 드래그해서 올려주세요</p>
+          <p class="mt">PDF 파일 올려주세요</p>
+          <p class="st">클릭하거나 드래그</p>
         </div>
         <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
-
         <div class="file-info" id="fileInfo">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="2" y="1" width="10" height="12" rx="2" stroke="#1A5FBE" stroke-width="1.3"/>
-            <line x1="4.5" y1="5" x2="9.5" y2="5" stroke="#1A5FBE" stroke-width="1.1"/>
-            <line x1="4.5" y1="7.5" x2="9.5" y2="7.5" stroke="#1A5FBE" stroke-width="1.1"/>
-          </svg>
-          <span id="fileName">파일명.pdf</span>
-          <span id="pageCount" style="color:#9ca3af; font-weight:400;"></span>
-          <button class="remove-btn" onclick="removeFile()">×</button>
+          <span id="fileName"></span>
+          <span id="pageCount" style="color:#9ca3af;font-weight:400;"></span>
+          <button class="rm-btn" onclick="removeFile()">×</button>
         </div>
-
-        <button class="btn-process" id="processBtn" onclick="processWatermark()" disabled>
-          워터마크 삽입 후 다운로드
-        </button>
+        <button class="btn-process" id="processBtn" onclick="processWatermark()" disabled>워터마크 삽입 후 다운로드</button>
       </div>
     </div>
   </div>
 
-  <!-- 미리보기 -->
   <div class="preview-panel">
     <div class="preview-toolbar">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <rect x="1" y="1" width="12" height="12" rx="2" stroke="#6b7280" stroke-width="1.2"/>
-        <line x1="4" y1="5" x2="10" y2="5" stroke="#6b7280" stroke-width="1"/>
-        <line x1="4" y1="7.5" x2="10" y2="7.5" stroke="#6b7280" stroke-width="1"/>
-        <line x1="4" y1="10" x2="7" y2="10" stroke="#6b7280" stroke-width="1"/>
-      </svg>
-      <span>슬라이드 미리보기</span>
+      <span>미리보기</span>
       <div class="page-nav">
         <button id="prevPage" onclick="changePage(-1)" disabled>‹</button>
         <span class="page-info" id="pageInfo">— / —</span>
         <button id="nextPage" onclick="changePage(1)" disabled>›</button>
       </div>
     </div>
-
-    <div class="progress-bar" id="progressBar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-
+    <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="status-msg" id="statusMsg"></div>
     <div class="canvas-wrap">
-      <div class="empty-preview" id="emptyPreview">
-        <div class="ep-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="18" height="18" rx="3" stroke="#b0b8c9" stroke-width="1.5"/>
-            <path d="M8 12h8M8 8h8M8 16h5" stroke="#b0b8c9" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <p>PDF를 업로드하면<br>여기서 미리볼 수 있어요</p>
-      </div>
-      <canvas id="previewCanvas" style="display:none;"></canvas>
+      <div class="empty-state" id="emptyState">PDF를 업로드하면<br>여기서 미리볼 수 있어요</div>
+      <canvas id="previewCanvas" style="display:none"></canvas>
     </div>
-
     <div class="download-bar" id="downloadBar">
-      <div class="download-info" id="downloadInfo"></div>
-      <button class="btn-download" id="downloadBtn" onclick="downloadResult()">↓ 다운로드</button>
+      <span class="download-info" id="downloadInfo"></span>
+      <button class="btn-dl" onclick="downloadResult()">↓ 다운로드</button>
     </div>
   </div>
 </div>
@@ -384,296 +175,280 @@ body {
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+const { PDFDocument, rgb } = PDFLib;
 
 let pdfFile = null;
 let pdfJsDoc = null;
 let currentPage = 1;
 let totalPages = 0;
-let processedPdfBytes = null;
+let resultBytes = null;
 
-// ── 드래그앤드롭 ──
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('drag');
+// 드래그앤드롭
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
   const f = e.dataTransfer.files[0];
   if (f && f.type === 'application/pdf') handleFile(f);
 });
 
 async function handleFile(file) {
-  if (!file) return;
-  pdfFile = file; processedPdfBytes = null;
+  pdfFile = file; resultBytes = null;
   document.getElementById('fileName').textContent = file.name;
   document.getElementById('fileInfo').classList.add('show');
   document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('downloadBar').classList.remove('show');
 
   const ab = await file.arrayBuffer();
   pdfJsDoc = await pdfjsLib.getDocument({ data: ab }).promise;
   totalPages = pdfJsDoc.numPages;
-  document.getElementById('pageCount').textContent = `· ${totalPages}페이지`;
+  document.getElementById('pageCount').textContent = '· ' + totalPages + '페이지';
   currentPage = 1;
-  updatePageNav();
-  renderPage(currentPage);
+  updateNav();
+  renderPage(currentPage, pdfJsDoc);
   document.getElementById('processBtn').disabled = false;
-  document.getElementById('downloadBar').classList.remove('show');
 }
 
 function removeFile() {
-  pdfFile = null; pdfJsDoc = null; processedPdfBytes = null;
-  currentPage = 1; totalPages = 0;
+  pdfFile = null; pdfJsDoc = null; resultBytes = null; currentPage = 1; totalPages = 0;
   document.getElementById('fileInfo').classList.remove('show');
   document.getElementById('uploadZone').style.display = 'block';
   document.getElementById('pdfInput').value = '';
   document.getElementById('processBtn').disabled = true;
   document.getElementById('previewCanvas').style.display = 'none';
-  document.getElementById('emptyPreview').style.display = 'flex';
+  document.getElementById('emptyState').style.display = 'block';
   document.getElementById('pageInfo').textContent = '— / —';
   document.getElementById('prevPage').disabled = true;
   document.getElementById('nextPage').disabled = true;
   document.getElementById('downloadBar').classList.remove('show');
+  setStatus('');
 }
 
-function updatePageNav() {
-  document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages}`;
+function updateNav() {
+  document.getElementById('pageInfo').textContent = currentPage + ' / ' + totalPages;
   document.getElementById('prevPage').disabled = currentPage <= 1;
   document.getElementById('nextPage').disabled = currentPage >= totalPages;
 }
 
-function changePage(d) {
+async function changePage(d) {
   const n = currentPage + d;
   if (n < 1 || n > totalPages) return;
-  currentPage = n; updatePageNav();
-  if (processedPdfBytes) renderProcessedPage(currentPage);
-  else renderPage(currentPage);
+  currentPage = n; updateNav();
+  if (resultBytes) {
+    const doc = await pdfjsLib.getDocument({ data: resultBytes }).promise;
+    renderPage(currentPage, doc);
+  } else {
+    renderPage(currentPage, pdfJsDoc);
+  }
 }
 
-async function renderPage(num) {
-  if (!pdfJsDoc) return;
-  document.getElementById('emptyPreview').style.display = 'none';
+async function renderPage(num, doc) {
+  document.getElementById('emptyState').style.display = 'none';
   const canvas = document.getElementById('previewCanvas');
   canvas.style.display = 'block';
-  const page = await pdfJsDoc.getPage(num);
-  const vp = page.getViewport({ scale: 1.3 });
-  canvas.width = vp.width; canvas.height = vp.height;
-  await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-}
-
-async function renderProcessedPage(num) {
-  if (!processedPdfBytes) return;
-  const doc = await pdfjsLib.getDocument({ data: processedPdfBytes }).promise;
   const page = await doc.getPage(num);
-  const canvas = document.getElementById('previewCanvas');
-  canvas.style.display = 'block';
-  document.getElementById('emptyPreview').style.display = 'none';
   const vp = page.getViewport({ scale: 1.3 });
   canvas.width = vp.width; canvas.height = vp.height;
   await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-}
-
-// ── swatch 미리보기 (canvas) ──
-function updateSwatch() {
-  const name = document.getElementById('pharmacyName').value || '약국명';
-  const extra = document.getElementById('extraText').value;
-  const opacity = parseInt(document.getElementById('wmOpacity').value) / 100;
-  const spacing = parseInt(document.getElementById('wmSpacing').value);
-  const fontSize = parseInt(document.getElementById('wmSize').value);
-  const text = buildWmText(name, extra, getToday());
-
-  const swatch = document.getElementById('wmSwatch');
-  swatch.innerHTML = '';
-  const cv = document.createElement('canvas');
-  cv.width = swatch.offsetWidth || 280; cv.height = 56;
-  const ctx = cv.getContext('2d');
-  drawTile(ctx, cv.width, cv.height, text, fontSize * 0.9, opacity, spacing * 0.35, -28);
-  swatch.appendChild(cv);
-}
-
-function drawTile(ctx, W, H, text, fs, opacity, spacing, angle) {
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.fillStyle = 'rgba(255,255,255,1)';
-  ctx.font = `500 ${fs}px 'IBM Plex Sans KR', sans-serif`;
-  ctx.textBaseline = 'middle';
-  const rad = angle * Math.PI / 180;
-  const tw = ctx.measureText(text).width;
-  const stepX = tw + spacing;
-  const stepY = spacing * 0.65;
-  const diag = Math.sqrt(W*W + H*H);
-  const cols = Math.ceil(diag / stepX) + 2;
-  const rows = Math.ceil(diag / stepY) + 2;
-  ctx.translate(W/2, H/2); ctx.rotate(rad);
-  for (let r = -rows; r <= rows; r++)
-    for (let c = -cols; c <= cols; c++)
-      ctx.fillText(text, c * stepX + (r%2)*(stepX/2), r * stepY);
-  ctx.restore();
-}
-
-function buildWmText(name, extra, date) {
-  let p = ['CONFIDENTIAL', name];
-  if (extra) p.push(extra);
-  p.push(date);
-  return p.join('  ·  ');
-}
-
-function getToday() {
-  const d = new Date();
-  return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
 }
 
 function setProgress(pct) {
   const bar = document.getElementById('progressBar');
   const fill = document.getElementById('progressFill');
   if (pct === null) { bar.classList.remove('show'); return; }
-  bar.classList.add('show'); fill.style.width = pct + '%';
+  bar.classList.add('show');
+  fill.style.width = pct + '%';
 }
 
-// ── 핵심: 벡터 PDF 워터마크 삽입 ──
+function setStatus(msg) {
+  const el = document.getElementById('statusMsg');
+  if (!msg) { el.classList.remove('show'); return; }
+  el.textContent = msg; el.classList.add('show');
+}
+
+function tick(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function getToday() {
+  const d = new Date();
+  return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+}
+
+function buildText(name, extra, date) {
+  return 'CONFIDENTIAL  ' + name + (extra ? '  ' + extra : '') + '  ' + date;
+}
+
+// swatch 미리보기
+function updateSwatch() {
+  const name = document.getElementById('pharmacyName').value || '약국명';
+  const extra = document.getElementById('extraText').value;
+  const opacity = parseInt(document.getElementById('wmOpacity').value) / 100;
+  const spacing = parseInt(document.getElementById('wmSpacing').value);
+  const fontSize = parseInt(document.getElementById('wmSize').value);
+  const text = buildText(name, extra, getToday());
+
+  const el = document.getElementById('wmSwatch');
+  el.innerHTML = '';
+  const cv = document.createElement('canvas');
+  cv.width = el.offsetWidth || 260; cv.height = 56;
+  drawWatermarkCanvas(cv.getContext('2d'), cv.width, cv.height, text, fontSize * 0.85, opacity, spacing * 0.35, -28, 'rgba(255,255,255,1)');
+  el.appendChild(cv);
+}
+
+// canvas에 타일 워터마크 그리기
+function drawWatermarkCanvas(ctx, W, H, text, fontSize, opacity, spacing, angleDeg, color) {
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.fillStyle = color;
+  ctx.font = '500 ' + fontSize + 'px "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+  ctx.textBaseline = 'middle';
+
+  const tw = ctx.measureText(text).width;
+  const stepX = tw + spacing;
+  const stepY = Math.max(spacing * 0.65, fontSize * 2);
+  const angleRad = angleDeg * Math.PI / 180;
+  const diag = Math.sqrt(W * W + H * H);
+  const cols = Math.ceil(diag / stepX) + 2;
+  const rows = Math.ceil(diag / stepY) + 2;
+
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate(angleRad);
+  for (let r = -rows; r <= rows; r++) {
+    for (let c = -cols; c <= cols; c++) {
+      const x = c * stepX + (r % 2) * (stepX / 2) - tw / 2;
+      const y = r * stepY;
+      ctx.fillText(text, x, y);
+    }
+  }
+  ctx.restore();
+}
+
 async function processWatermark() {
   if (!pdfFile) return;
 
   const name = document.getElementById('pharmacyName').value.trim() || '약국명';
   const extra = document.getElementById('extraText').value.trim();
   const today = getToday();
-  const wmText = buildWmText(name, extra, today);
+  const wmText = buildText(name, extra, today);
   const fontSize = parseInt(document.getElementById('wmSize').value);
   const opacity = parseInt(document.getElementById('wmOpacity').value) / 100;
   const spacing = parseInt(document.getElementById('wmSpacing').value);
-  const angleDeg = -28;
 
   const btn = document.getElementById('processBtn');
-  btn.disabled = true;
-  btn.textContent = '처리 중...';
-
-  // UI 업데이트가 실제로 렌더링되도록 한 프레임 양보
-  await new Promise(r => setTimeout(r, 50));
-  setProgress(5);
-  await new Promise(r => setTimeout(r, 30));
+  btn.disabled = true; btn.textContent = '처리 중...';
+  setProgress(0); setStatus('PDF 불러오는 중...');
+  await tick(50);
 
   try {
     setProgress(10);
-    await new Promise(r => setTimeout(r, 30));
-
     const arrayBuffer = await pdfFile.arrayBuffer();
+    await tick(30);
+
+    setStatus('PDF 분석 중...');
     setProgress(20);
-    await new Promise(r => setTimeout(r, 30));
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    await tick(30);
 
-    const pdfDoc2 = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+    // 메타데이터 제거 (검색 차단)
+    pdfDoc.setTitle(''); pdfDoc.setAuthor(''); pdfDoc.setSubject('');
+    pdfDoc.setKeywords([]); pdfDoc.setProducer(''); pdfDoc.setCreator('');
 
-    // 메타데이터 삭제 (검색 차단)
-    pdfDoc2.setTitle('');
-    pdfDoc2.setAuthor('');
-    pdfDoc2.setSubject('');
-    pdfDoc2.setKeywords([]);
-    pdfDoc2.setProducer('');
-    pdfDoc2.setCreator('');
+    const pages = pdfDoc.getPages();
 
-    setProgress(25);
+    setStatus('워터마크 이미지 생성 중...');
+    setProgress(30);
+    await tick(30);
 
-    const pages = pdfDoc2.getPages();
-
-    // 첫 페이지 크기 기준으로 워터마크 PNG 1장 생성 (모든 페이지 공용)
-    // 300dpi급 고해상도로 그려서 인쇄 화질 확보
-    const scale = 3; // 3배 = 약 216dpi (A4 기준)
+    // 첫 페이지 기준으로 워터마크 PNG 한 장 생성 (고해상도)
     const refPage = pages[0];
-    const refW = Math.round(refPage.getSize().width * scale);
-    const refH = Math.round(refPage.getSize().height * scale);
+    const refW = refPage.getWidth();
+    const refH = refPage.getHeight();
+    const scale = 2; // 2배 해상도
+    const cvW = Math.round(refW * scale);
+    const cvH = Math.round(refH * scale);
 
-    const offCanvas = document.createElement('canvas');
-    offCanvas.width = refW;
-    offCanvas.height = refH;
-    const ctx = offCanvas.getContext('2d');
+    const offCv = document.createElement('canvas');
+    offCv.width = cvW; offCv.height = cvH;
+    const ctx = offCv.getContext('2d');
+    ctx.clearRect(0, 0, cvW, cvH);
 
-    // 투명 배경에 타일 워터마크
-    ctx.clearRect(0, 0, refW, refH);
-    ctx.globalAlpha = opacity;
-    ctx.fillStyle = 'rgba(25, 25, 90, 1)';
-    const scaledFont = Math.round(fontSize * scale);
-    ctx.font = `500 ${scaledFont}px "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`;
-    ctx.textBaseline = 'middle';
-
-    const textWidth = ctx.measureText(wmText).width;
-    const stepX = textWidth + spacing * scale;
-    const stepY = spacing * scale * 0.65;
-    const angleRad = angleDeg * Math.PI / 180;
-
-    const diag = Math.sqrt(refW * refW + refH * refH);
-    const cols = Math.ceil(diag / stepX) + 3;
-    const rows = Math.ceil(diag / stepY) + 3;
-
-    ctx.save();
-    ctx.translate(refW / 2, refH / 2);
-    ctx.rotate(angleRad);
-    for (let r = -rows; r <= rows; r++) {
-      for (let c = -cols; c <= cols; c++) {
-        const x = c * stepX + (r % 2) * (stepX / 2);
-        const y = r * stepY;
-        ctx.fillText(wmText, x - textWidth / 2, y);
-      }
-    }
-    ctx.restore();
-
-    setProgress(40);
-    await new Promise(r => setTimeout(r, 30));
-
-    // canvas → PNG bytes
-    const pngDataUrl = offCanvas.toDataURL('image/png');
-    const b64 = pngDataUrl.split(',')[1];
-    const binStr = atob(b64);
-    const pngBytes = new Uint8Array(binStr.length);
-    for (let i = 0; i < binStr.length; i++) pngBytes[i] = binStr.charCodeAt(i);
+    drawWatermarkCanvas(
+      ctx, cvW, cvH, wmText,
+      fontSize * scale,       // 폰트 크기 (스케일 반영)
+      opacity,
+      spacing * scale,        // 간격 (스케일 반영)
+      -28,
+      'rgba(25, 25, 90, 1)'  // 진한 남색
+    );
 
     setProgress(50);
-    await new Promise(r => setTimeout(r, 30));
+    await tick(30);
 
-    const wmImage = await pdfDoc2.embedPng(pngBytes);
+    // canvas → PNG bytes
+    setStatus('이미지 변환 중...');
+    const dataUrl = offCv.toDataURL('image/png');
+    const b64 = dataUrl.split(',')[1];
+    const bin = atob(b64);
+    const pngBytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) pngBytes[i] = bin.charCodeAt(i);
+
+    setProgress(60);
+    await tick(30);
+
+    // PNG를 pdf-lib에 임베드
+    setStatus('PDF에 워터마크 삽입 중...');
+    const wmImg = await pdfDoc.embedPng(pngBytes);
 
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i];
-      const { width, height } = page.getSize();
-      // 워터마크 이미지를 페이지 전체에 투명하게 덮음
-      page.drawImage(wmImage, { x: 0, y: 0, width, height, opacity: 1 });
-
-      setProgress(50 + Math.round((i + 1) / pages.length * 38));
-      await new Promise(r => setTimeout(r, 0));
+      const w = page.getWidth();
+      const h = page.getHeight();
+      page.drawImage(wmImg, { x: 0, y: 0, width: w, height: h });
+      setProgress(60 + Math.round((i + 1) / pages.length * 28));
+      await tick(0);
     }
 
-    setProgress(88);
-    await new Promise(r => setTimeout(r, 30));
+    setStatus('저장 중...');
+    setProgress(90);
+    await tick(30);
 
-    processedPdfBytes = await pdfDoc2.save();
+    resultBytes = await pdfDoc.save();
     setProgress(98);
-    await new Promise(r => setTimeout(r, 30));
+    await tick(30);
 
-    await renderProcessedPage(currentPage);
+    // 미리보기 업데이트
+    setStatus('미리보기 렌더링 중...');
+    const previewDoc = await pdfjsLib.getDocument({ data: resultBytes }).promise;
+    await renderPage(currentPage, previewDoc);
 
-    const outName = pdfFile.name.replace(/\.pdf$/i, '') + `_${name.replace(/\s/g,'')}_${today.replace(/\./g,'')}.pdf`;
+    const outName = pdfFile.name.replace(/\.pdf$/i, '') + '_' + name.replace(/\s/g,'') + '_' + today.replace(/\./g,'') + '.pdf';
+    window._outName = outName;
+
     document.getElementById('downloadBar').classList.add('show');
-    document.getElementById('downloadInfo').textContent = `${pages.length}페이지 처리 완료 · ${outName}`;
-    window._outFileName = outName;
-
+    document.getElementById('downloadInfo').textContent = pages.length + '페이지 완료 · ' + outName;
     setProgress(100);
-    setTimeout(() => setProgress(null), 800);
+    await tick(800);
+    setProgress(null);
+    setStatus('');
 
   } catch(e) {
     console.error(e);
-    alert('처리 중 오류: ' + e.message);
+    alert('오류: ' + e.message);
     setProgress(null);
+    setStatus('');
   }
 
-  btn.disabled = false;
-  btn.textContent = '워터마크 삽입 후 다운로드';
+  btn.disabled = false; btn.textContent = '워터마크 삽입 후 다운로드';
 }
 
 function downloadResult() {
-  if (!processedPdfBytes) return;
-  const filename = window._outFileName || 'watermarked.pdf';
-  const blob = new Blob([processedPdfBytes], { type: 'application/pdf' });
+  if (!resultBytes) return;
+  const blob = new Blob([resultBytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  a.click();
+  a.href = url; a.download = window._outName || 'watermarked.pdf';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
