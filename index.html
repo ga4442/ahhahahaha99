@@ -100,7 +100,7 @@ body { font-family: 'IBM Plex Sans KR', sans-serif; background: #f4f6f9; min-hei
         </div>
         <div class="field">
           <label>추가 정보 (선택)</label>
-          <input type="text" id="extraText" placeholder="예: 약사님 전달용" oninput="updateSwatch()">
+          <input type="text" id="extraText" placeholder="예: 원장님 전달용" oninput="updateSwatch()">
         </div>
         <div class="divider"></div>
         <div class="field">
@@ -179,6 +179,7 @@ const { PDFDocument, rgb } = PDFLib;
 
 let pdfFile = null;
 let pdfJsDoc = null;
+let pdfOrigBytes = null;
 let currentPage = 1;
 let totalPages = 0;
 let resultBytes = null;
@@ -200,8 +201,8 @@ async function handleFile(file) {
   document.getElementById('uploadZone').style.display = 'none';
   document.getElementById('downloadBar').classList.remove('show');
 
-  const ab = await file.arrayBuffer();
-  pdfJsDoc = await pdfjsLib.getDocument({ data: ab }).promise;
+  pdfOrigBytes = await file.arrayBuffer();
+  pdfJsDoc = await pdfjsLib.getDocument({ data: pdfOrigBytes.slice(0) }).promise;
   totalPages = pdfJsDoc.numPages;
   document.getElementById('pageCount').textContent = '· ' + totalPages + '페이지';
   currentPage = 1;
@@ -211,7 +212,7 @@ async function handleFile(file) {
 }
 
 function removeFile() {
-  pdfFile = null; pdfJsDoc = null; resultBytes = null; currentPage = 1; totalPages = 0;
+  pdfFile = null; pdfJsDoc = null; pdfOrigBytes = null; resultBytes = null; currentPage = 1; totalPages = 0;
   document.getElementById('fileInfo').classList.remove('show');
   document.getElementById('uploadZone').style.display = 'block';
   document.getElementById('pdfInput').value = '';
@@ -235,12 +236,9 @@ async function changePage(d) {
   const n = currentPage + d;
   if (n < 1 || n > totalPages) return;
   currentPage = n; updateNav();
-  if (resultBytes) {
-    const doc = await pdfjsLib.getDocument({ data: resultBytes }).promise;
-    renderPage(currentPage, doc);
-  } else {
-    renderPage(currentPage, pdfJsDoc);
-  }
+  const bytes = resultBytes ? resultBytes : pdfOrigBytes.slice(0);
+  const doc = await pdfjsLib.getDocument({ data: bytes }).promise;
+  renderPage(currentPage, doc);
 }
 
 async function renderPage(num, doc) {
@@ -341,7 +339,7 @@ async function processWatermark() {
 
   try {
     setProgress(10);
-    const arrayBuffer = await pdfFile.arrayBuffer();
+    const arrayBuffer = pdfOrigBytes.slice(0);
     await tick(30);
 
     setStatus('PDF 분석 중...');
@@ -412,13 +410,17 @@ async function processWatermark() {
     setProgress(90);
     await tick(30);
 
-    resultBytes = await pdfDoc.save();
+    // saveAsBase64으로 저장 (Uint8Array blob 변환 문제 방지)
+    const base64 = await pdfDoc.saveAsBase64({ dataUri: false });
+    const bin = atob(base64);
+    resultBytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) resultBytes[i] = bin.charCodeAt(i);
     setProgress(98);
     await tick(30);
 
     // 미리보기 업데이트
     setStatus('미리보기 렌더링 중...');
-    const previewDoc = await pdfjsLib.getDocument({ data: resultBytes }).promise;
+    const previewDoc = await pdfjsLib.getDocument({ data: resultBytes.buffer }).promise;
     await renderPage(currentPage, previewDoc);
 
     const outName = pdfFile.name.replace(/\.pdf$/i, '') + '_' + name.replace(/\s/g,'') + '_' + today.replace(/\./g,'') + '.pdf';
@@ -443,13 +445,13 @@ async function processWatermark() {
 
 function downloadResult() {
   if (!resultBytes) return;
-  const blob = new Blob([resultBytes], { type: 'application/pdf' });
+  const blob = new Blob([resultBytes.buffer], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = window._outName || 'watermarked.pdf';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 updateSwatch();
