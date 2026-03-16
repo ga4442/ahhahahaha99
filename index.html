@@ -428,14 +428,21 @@ function initApp() {
       setProgress(88); setStatus('저장 중...');
       await tick(30);
 
-      // 7. 저장 → Uint8Array
-      resultBytes = await pdfDoc.save();
+      // 7. base64 data URI로 저장 (Blob/URL 변환 없이 직접 다운로드)
+      var dataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+      resultBytes = dataUri; // data URI 문자열로 저장
+
+      // 미리보기용 Uint8Array 별도 생성
+      var b64 = dataUri.split(',')[1];
+      var bin = atob(b64);
+      var arr = new Uint8Array(bin.length);
+      for (var bi = 0; bi < bin.length; bi++) arr[bi] = bin.charCodeAt(bi);
 
       setProgress(95); setStatus('미리보기 렌더링 중...');
       await tick(30);
 
       // 8. 결과 미리보기
-      var previewDoc = await pdfjsLib.getDocument({ data: resultBytes }).promise;
+      var previewDoc = await pdfjsLib.getDocument({ data: arr }).promise;
       renderFromDoc(previewDoc, currentPage);
 
       outName = pdfFile.name.replace(/\.pdf$/i, '') + '_' + name.replace(/\s/g, '') + '_' + today.replace(/\./g, '') + '.pdf';
@@ -457,14 +464,13 @@ function initApp() {
 
   function doDownload() {
     if (!resultBytes) return;
-    var blob = new Blob([resultBytes], { type: 'application/pdf' });
-    var url = URL.createObjectURL(blob);
+    // data URI를 href에 직접 넣어 다운로드 (Blob 변환 없음)
     var a = document.createElement('a');
-    a.href = url; a.download = outName;
+    a.href = resultBytes;
+    a.download = outName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
   }
 
   // swatch
