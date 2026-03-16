@@ -16,6 +16,7 @@
 <title>참약사</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -309,10 +310,6 @@ body {
           <span class="tag gray">브라우저 내 처리</span>
         </div>
 
-        <div class="notice" id="fontNotice">
-          <strong>폰트 로딩 중...</strong> 한글 워터마크를 위해 폰트를 불러오고 있습니다.
-        </div>
-
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('pdfInput').click()">
           <div class="upload-icon">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -394,39 +391,6 @@ let pdfJsDoc = null;
 let currentPage = 1;
 let totalPages = 0;
 let processedPdfBytes = null;
-let koreanFontBytes = null;  // TTF ArrayBuffer
-let fontLoaded = false;
-
-// ── 폰트 로딩 (브라우저에서 Google Fonts API TTF 직접 fetch) ──
-async function loadKoreanFont() {
-  document.getElementById('fontNotice').classList.add('show');
-  try {
-    const cssRes = await fetch('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-    });
-    const css = await cssRes.text();
-    const ttfMatch = css.match(/url\(([^)]+)\)\s*format\(['"]?truetype['"]?\)/i);
-    const woff2Match = css.match(/url\((https:\/\/fonts\.gstatic\.com[^)]+)\)\s*format\(['"]?woff2['"]?\)/);
-    const fontUrl = ttfMatch ? ttfMatch[1].replace(/['"]/g, '') :
-                   woff2Match ? woff2Match[1] : null;
-    if (!fontUrl) throw new Error('font URL not found');
-    const fontRes = await fetch(fontUrl);
-    koreanFontBytes = await fontRes.arrayBuffer();
-    if (koreanFontBytes.byteLength < 1000) throw new Error('font too small');
-    fontLoaded = true;
-    document.getElementById('fontNotice').classList.remove('show');
-  } catch(e) {
-    fontLoaded = false;
-    const notice = document.getElementById('fontNotice');
-    notice.innerHTML = '<strong>안내:</strong> 한글 폰트 로딩 실패. 영문/숫자 워터마크는 정상 작동합니다.';
-    notice.style.background = '#fff3f3';
-    notice.style.borderColor = '#ffb3b3';
-    notice.style.color = '#8b2020';
-  }
-}
-
-// 페이지 로드 시 폰트 미리 로딩
-loadKoreanFont();
 
 // ── 드래그앤드롭 ──
 const uploadZone = document.getElementById('uploadZone');
@@ -579,109 +543,92 @@ async function processWatermark() {
   const angleDeg = -28;
 
   const btn = document.getElementById('processBtn');
-  btn.disabled = true; btn.textContent = '처리 중...';
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+
+  // UI 업데이트가 실제로 렌더링되도록 한 프레임 양보
+  await new Promise(r => setTimeout(r, 50));
   setProgress(5);
+  await new Promise(r => setTimeout(r, 30));
 
   try {
+    setProgress(10);
+    await new Promise(r => setTimeout(r, 30));
+
     const arrayBuffer = await pdfFile.arrayBuffer();
-    setProgress(15);
+    setProgress(20);
+    await new Promise(r => setTimeout(r, 30));
 
-    const pdfDoc2 = await PDFDocument.load(arrayBuffer, {
-      // 기존 텍스트 레이어 유지하되 메타데이터 제거
-      ignoreEncryption: true
-    });
+    const pdfDoc2 = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
 
-    // ── 검색 차단 처리 ──
-    // 1. 메타데이터 완전 삭제 (제목, 작성자, 키워드 등)
+    // 메타데이터 삭제 (검색 차단)
     pdfDoc2.setTitle('');
     pdfDoc2.setAuthor('');
     pdfDoc2.setSubject('');
     pdfDoc2.setKeywords([]);
     pdfDoc2.setProducer('');
     pdfDoc2.setCreator('');
-    // XMP 메타데이터도 제거
-    pdfDoc2.catalog.delete(pdfDoc2.context.obj('Metadata'));
 
-    setProgress(20);
+    setProgress(25);
 
     const pages = pdfDoc2.getPages();
 
-    // 폰트 설정
-    let font;
-    if (fontLoaded && koreanFontBytes) {
-      font = await pdfDoc2.embedFont(koreanFontBytes, { subset: false });
-    } else {
-      // 폴백: Helvetica (영문/숫자만 지원)
-      font = await pdfDoc2.embedFont(StandardFonts.Helvetica);
-    }
+    // Helvetica 내장 폰트 (설치 불필요, 영문/숫자/특수문자 지원)
+    const font = await pdfDoc2.embedFont(StandardFonts.Helvetica);
+
+    const angleRad = angleDeg * Math.PI / 180;
+    const cosA = Math.cos(angleRad);
+    const sinA = Math.sin(angleRad);
+
+    // 워터마크 텍스트 폭 계산 (Helvetica 기준)
+    const textWidth = font.widthOfTextAtSize(wmText, fontSize);
+    const stepX = textWidth + spacing;
+    const stepY = spacing * 0.65;
 
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i];
       const { width, height } = page.getSize();
-
-      // 벡터 텍스트 타일 워터마크
-      // PDF 좌표계: 좌하단 원점, Y축 위가 양수
-      // 회전 중심을 페이지 중앙으로 설정
-      const angleRad = angleDeg * Math.PI / 180;
-
-      // 텍스트 폭 측정 (pdf-lib 방식)
-      const charWidth = fontSize * 0.55; // 평균 글자폭 추정
-      const textWidth = wmText.length * charWidth;
-      const stepX = textWidth + spacing;
-      const stepY = spacing * 0.65;
+      const cx = width / 2;
+      const cy = height / 2;
 
       const diag = Math.sqrt(width * width + height * height);
       const cols = Math.ceil(diag / stepX) + 3;
       const rows = Math.ceil(diag / stepY) + 3;
 
-      const cx = width / 2;
-      const cy = height / 2;
-
       for (let r = -rows; r <= rows; r++) {
         for (let c = -cols; c <= cols; c++) {
-          // 타일 위치 (회전 전, 중앙 기준)
           const localX = c * stepX + (r % 2) * (stepX / 2);
           const localY = r * stepY;
-
-          // 회전 변환
-          const cosA = Math.cos(angleRad);
-          const sinA = Math.sin(angleRad);
           const rotX = localX * cosA - localY * sinA;
           const rotY = localX * sinA + localY * cosA;
+          const finalX = cx + rotX - textWidth / 2;
+          const finalY = cy + rotY - fontSize / 3;
 
-          const finalX = cx + rotX;
-          const finalY = cy + rotY;
+          if (finalX < -300 || finalX > width + 300) continue;
+          if (finalY < -300 || finalY > height + 300) continue;
 
-          // 페이지 범위 밖은 스킵 (성능)
-          if (finalX < -200 || finalX > width + 200) continue;
-          if (finalY < -200 || finalY > height + 200) continue;
-
-          try {
-            page.drawText(wmText, {
-              x: finalX - textWidth / 2,
-              y: finalY - fontSize / 3,
-              size: fontSize,
-              font,
-              color: rgb(0.1, 0.1, 0.35),
-              opacity,
-              rotate: degrees(angleDeg),
-            });
-          } catch(e) {
-            // 개별 텍스트 오류 무시
-          }
+          page.drawText(wmText, {
+            x: finalX,
+            y: finalY,
+            size: fontSize,
+            font,
+            color: rgb(0.1, 0.1, 0.35),
+            opacity,
+            rotate: degrees(angleDeg),
+          });
         }
       }
 
-      setProgress(20 + Math.round((i + 1) / pages.length * 72));
+      setProgress(25 + Math.round((i + 1) / pages.length * 60));
+      await new Promise(r => setTimeout(r, 0)); // 페이지마다 UI 업데이트
     }
 
-    setProgress(95);
-    processedPdfBytes = await pdfDoc2.save({
-      // 선형화 비활성화로 파일 구조 단순화
-      addDefaultPage: false,
-      objectsPerTick: 50,
-    });
-    setProgress(100);
+    setProgress(88);
+    await new Promise(r => setTimeout(r, 30));
+
+    processedPdfBytes = await pdfDoc2.save();
+    setProgress(98);
+    await new Promise(r => setTimeout(r, 30));
 
     await renderProcessedPage(currentPage);
 
@@ -690,7 +637,8 @@ async function processWatermark() {
     document.getElementById('downloadInfo').textContent = `${pages.length}페이지 처리 완료 · ${outName}`;
     window._outFileName = outName;
 
-    setTimeout(() => setProgress(null), 600);
+    setProgress(100);
+    setTimeout(() => setProgress(null), 800);
 
   } catch(e) {
     console.error(e);
